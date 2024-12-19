@@ -21,7 +21,7 @@ class CustomTextFormField extends StatelessWidget {
       margin: EdgeInsets.all(5),
       padding: EdgeInsets.only(left: 16),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1.0), // Adds a border
+        border: Border.all(color: Colors.black, width: 3), // Adds a border
         borderRadius: BorderRadius.circular(8), // Rounds the corners
       ),
       child: TextFormField(
@@ -30,6 +30,7 @@ class CustomTextFormField extends StatelessWidget {
               icon: Icon(icon, color: Colors.black,),
               hintText: hintText,
               border: InputBorder.none,
+
               hintStyle: TextStyle(
                   color: Colors.black,fontWeight: FontWeight.bold
               )

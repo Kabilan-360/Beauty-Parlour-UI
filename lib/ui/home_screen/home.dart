@@ -16,7 +16,40 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<String> serviceNames = [];
+  TextEditingController searchController = TextEditingController();
+  List<Map<String, dynamic>> services = [];
+  List<Map<String, dynamic>> filteredServices = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize services
+    services = [
+      {'name': 'Skincare', 'price': 50.0},
+      {'name': 'Haircare', 'price': 40.0},
+      {'name': 'Makeup', 'price': 70.0},
+    ];
+    filteredServices = List.from(services);
+    // Listen to search changes
+    searchController.addListener(() {
+      final text = searchController.text.trim();
+      final enteredPrice = double.tryParse(text);
+
+      setState(() {
+        if (enteredPrice != null) {
+          // Filter services by price
+          filteredServices = services
+              .where((service) => service['price'] <= enteredPrice)
+              .toList();
+        } else {
+          // Reset to all services if input is empty
+          filteredServices = text.isEmpty ? List.from(services) : [];
+        }
+      });
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -30,19 +63,21 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Search Bar
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Search for services',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(16.0),
+                //   child: TextField(
+                //     decoration: InputDecoration(
+                //       prefixIcon: Icon(Icons.search),
+                //       hintText: 'Search for services',
+                //       border: OutlineInputBorder(
+                //         borderRadius: BorderRadius.circular(12),
+                //         borderSide: BorderSide(color: Colors.grey),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+
+
 
                 // Categories Section
                 Row(
@@ -83,45 +118,95 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
 
+                // SizedBox(
+                //   height: 100,
+                //   child: ListView(
+                //     scrollDirection: Axis.horizontal,
+                //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                //     children: [
+                //       _buildCategoryChip('Skincare',
+                //         onTap: () {
+                //           Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (context) => SkincareScreen(title: "Skincare"),
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //       _buildCategoryChip('Hair Care',
+                //         onTap: () {
+                //           Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (context) => HairCareScreen(title: 'Hair Care Treatment'),
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //       _buildCategoryChip('Makeup',
+                //       onTap: (){
+                //         Navigator.push(
+                //           context,
+                //           MaterialPageRoute(
+                //             builder: (context) => MakeupScreen(title: 'Makeup Session'),
+                //           ),
+                //         );
+                //
+                //       }),
+                //     ],
+                //   ),
+                // ),
+
+
+                SizedBox(height: 20,),
                 SizedBox(
                   height: 100,
                   child: ListView(
-                    scrollDirection: Axis.horizontal,
+                    // scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     children: [
-                      _buildCategoryChip('Skincare',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SkincareScreen(title: "Skincare"),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildCategoryChip('Hair Care',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HairCareScreen(title: 'Hair Care Treatment'),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildCategoryChip('Makeup',
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MakeupScreen(title: 'Makeup Session'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildCategoryChip('Skincare',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SkincareScreen(title: "Skincare"),
+                                ),
+                              );
+                            },
                           ),
-                        );
-
-                      }),
+                          const Spacer(), // Adds space between items
+                          _buildCategoryChip('Hair Care',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HairCareScreen(title: 'Hair Care Treatment'),
+                                ),
+                              );
+                            },
+                          ),
+                          const Spacer(),
+                          _buildCategoryChip('Makeup',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MakeupScreen(title: 'Makeup Session'),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
+
 
 
                 Padding(
@@ -161,60 +246,46 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
-
-                    IconButton(onPressed: _showAddServiceDialog,
-                        icon: Icon(Icons.add,color: Colors.green,))
+                    IconButton(
+                      onPressed: _showAddServiceDialog,
+                      icon: Icon(Icons.add, color: Colors.green),
+                    ),
                   ],
                 ),
 
-                _buildServiceCard(
-                  'Skincare',
-                  onTap: () {
-                    print('Custom action for Skincare Treatment');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                BookNowButton(title: "Skincare")));
-                  },
+
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child:TextField(
+                    controller: searchController,
+                    keyboardType: TextInputType.number, // Allows numeric input
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Search services by price (e.g., 50)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      errorText: double.tryParse(searchController.text) == null &&
+                          searchController.text.isNotEmpty
+                          ? 'Enter a valid number'
+                          : null, // Show error if input is invalid
+                    ),
+                  ),
+
                 ),
-                _buildServiceCard(
-                  'Haircare',
-                  onTap: () {
-                    print('Custom action for Haircare Treatment');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                BookNowButton(title: "Haircare")));
-                  },
-                ),
-                _buildServiceCard(
-                  'Makeup',
-                  onTap: () {
-                    print('Custom action for Makeup Treatment');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                BookNowButton(title: "Makeup")));
-                  },
-                ),
-                ...serviceNames.map((serviceName) {
-                  // You can define a default action or customize it
+
+
+                // Display filtered service cards
+                ...filteredServices.map((service) {
                   return _buildServiceCard(
-                    serviceName,
+                    service['name'],
+                    price: service['price'],
                     onTap: () {
-                      print('Custom action for $serviceName Treatment');
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BookNowButton(title: serviceName),
-                        ),
-                      );
+                      print('Custom action for ${service['name']} Treatment');
                     },
                   );
                 }).toList(),
+
 
 
                 // Navigate to Service Details Button
@@ -296,35 +367,62 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Function to show alert dialog for adding a service
   void _showAddServiceDialog() {
-    final TextEditingController serviceController = TextEditingController();
+    final TextEditingController serviceNameController = TextEditingController();
+    final TextEditingController servicePriceController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Add New Service'),
-          content: TextField(
-            controller: serviceController,
-            decoration: InputDecoration(
-              hintText: 'Enter service name',
-              border: OutlineInputBorder(),
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: serviceNameController,
+                decoration: InputDecoration(
+                  hintText: 'Enter service name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: servicePriceController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: 'Enter service price',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                if (serviceController.text.trim().isNotEmpty) {
-                  setState(() {
-                    // Add new service to the list
-                    serviceNames.add(serviceController.text.trim());
-                  });
-                  Navigator.of(context).pop(); // Close the dialog
+                if (serviceNameController.text.trim().isNotEmpty &&
+                    servicePriceController.text.trim().isNotEmpty) {
+                  final price = double.tryParse(servicePriceController.text.trim());
+                  if (price != null) {
+                    setState(() {
+                      services.add({
+                        'name': serviceNameController.text.trim(),
+                        'price': price,
+                      });
+                      filteredServices = List.from(services);
+                    });
+                    Navigator.of(context).pop();
+                  } else {
+                    // Show an error if price is invalid
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid price entered')),
+                    );
+                  }
                 }
               },
               child: Text('Add'),
@@ -337,10 +435,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
+
   Widget _buildServiceCard(
-    String serviceName, {
-    void Function()? onTap, // Optional onTap parameter
-  }) {
+      String serviceName, {
+        required double price,
+        void Function()? onTap,
+      }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       elevation: 4,
@@ -370,11 +470,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    serviceName, // Use the dynamic service name here
+                    serviceName,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Text('Price: \$50'),
+                  Text('Price: \$${price.toStringAsFixed(2)}'),
                   SizedBox(height: 8),
                   Text('Duration: 30 mins'),
                 ],
@@ -383,9 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // Book Now Button
             ElevatedButton(
               onPressed: onTap,
-
               style: ElevatedButton.styleFrom(
-
                 backgroundColor: Colors.blue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

@@ -47,7 +47,7 @@ class _LogInPageState extends State<LogInPage> {
                         Center(
                           child: Text(
                             "Log In",
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                           ),
                         ),
                         CustomTextFormField(
